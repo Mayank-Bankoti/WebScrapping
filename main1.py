@@ -24,6 +24,7 @@ def generate_url(index):
         return format("https://www.naukri.com/software-developer-jobs?k=software%20developer&nignbevent_src=jobsearchDeskGNB-{}".format(index))
     return url
 
+
 def extract_rating(rating_a):
     if rating_a is None or rating_a.find('span', class_="main-2") is None:
         return "None"
@@ -75,6 +76,34 @@ def parse_job_data_from_soup(page_jobs):
                 "Minimum Requirements": min_requirements,
                 "Tech Stack": ", ".join(all_tech_stack)
             })
+        
+        row1 = job.find('div', class_="row1")
+        if row1:
+            anchor = row1.find('a')
+            if anchor and 'href' in anchor.attrs:
+                job_href = anchor.get('href')
+                print("Job Link:", job_href)
+                driver.get(job_href)
+                # sleep for 5-10 seconds randomly just to let it load
+                sleep(randint(5, 10))
+                get_url = driver.current_url
+                if get_url == url:
+                    page_source1 = driver.page_source
+                # Generate the soup
+                soup = BeautifulSoup(page_source1, 'html.parser')
+                
+                container = soup.find('div', class_="styles_JDC__dang-inner-html__h0K4t")
+                if container:
+                    # This gets all the text inside the container, combining text from all inner tags.
+                    combined_text = container.get_text(separator=" ", strip=True)
+                    print(combined_text)
+                else:
+                    print("Container not found")
+            else:
+                print("Anchor tag or href not found in row1")
+        else:
+            print("row1 not found")
+            
         print("***************END***************")
     print("********PAGE_JOBS END***********")
 
