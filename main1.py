@@ -66,17 +66,7 @@ def parse_job_data_from_soup(page_jobs):
         print("Location : {}" .format(location))
         print("Minimum Requirements : {}" .format(min_requirements))
         print("All Tech Stack : {}" .format(all_tech_stack))
-        
-        job_list.append({
-                "Job Title": job_title,
-                "Company Name": company_name,
-                "Rating": rating,
-                "Experience": ex_wrap,
-                "Location": location,
-                "Minimum Requirements": min_requirements,
-                "Tech Stack": ", ".join(all_tech_stack)
-            })
-        
+        global combined_text
         row1 = job.find('div', class_="row1")
         if row1:
             anchor = row1.find('a')
@@ -90,10 +80,12 @@ def parse_job_data_from_soup(page_jobs):
                 if get_url == url:
                     page_source1 = driver.page_source
                 # Generate the soup
-                soup = BeautifulSoup(page_source1, 'html.parser')
+                page_source1 = driver.page_source
+                soup_detail = BeautifulSoup(page_source1, 'html.parser')
                 
-                container = soup.find('div', class_="styles_JDC__dang-inner-html__h0K4t")
+                container = soup_detail.find('div', class_="styles_JDC__dang-inner-html__h0K4t")
                 if container:
+                    global combined_text
                     # This gets all the text inside the container, combining text from all inner tags.
                     combined_text = container.get_text(separator=" ", strip=True)
                     print(combined_text)
@@ -103,7 +95,16 @@ def parse_job_data_from_soup(page_jobs):
                 print("Anchor tag or href not found in row1")
         else:
             print("row1 not found")
-            
+        job_list.append({
+        "Job Title": job_title,
+        "Company Name": company_name,
+        "Rating": rating,
+        "Experience": ex_wrap,
+        "Location": location,
+        "Minimum Requirements": min_requirements,
+        "Tech Stack": ", ".join(all_tech_stack),
+        "Job description": combined_text,
+        })
         print("***************END***************")
     print("********PAGE_JOBS END***********")
 
