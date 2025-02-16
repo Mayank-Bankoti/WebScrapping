@@ -91,6 +91,14 @@ def parse_job_data_from_soup(page_jobs):
                     print(combined_text)
                 else:
                     print("Container not found")
+                comma_span = soup.find('span', class_='styles_comma__6l5nn')
+
+                if comma_span:
+                    # Extract the text from the span
+                    extracted_text = comma_span.get_text(strip=True)
+                    print("Extracted text:", extracted_text)
+                else:
+                    print("Span element not found")
             else:
                 print("Anchor tag or href not found in row1")
         else:
@@ -104,18 +112,20 @@ def parse_job_data_from_soup(page_jobs):
         "Minimum Requirements": min_requirements,
         "Tech Stack": ", ".join(all_tech_stack),
         "Job description": combined_text,
+        "Roles": extracted_text,
         })
         print("***************END***************")
     print("********PAGE_JOBS END***********")
 
 
 options = webdriver.ChromeOptions() 
-options.headless = True 
+options.headless = False 
+options.add_experimental_option("excludeSwitches", ["enable-automation"])
 # driver=webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-driver = webdriver.Chrome()
+driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 start_page = 1
 # edit the page_end here
-page_end = 5
+page_end = 2
 for i in range(start_page, page_end):
     print(i)
     url = generate_url(i)
@@ -136,5 +146,5 @@ df = pd.DataFrame(job_list)
 print(df.head())
 
 # Save data to CSV
-df.to_csv("naukri_jobs.csv", index=False)
+df.to_csv("naukri_jobs_1.csv", index=False)
 print("Data saved to naukri_jobs.csv")
